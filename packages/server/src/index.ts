@@ -38,7 +38,7 @@ const llm = makeOpenAiChatLlm({
   openAiClient,
   deployment: OPENAI_CHAT_COMPLETION_MODEL,
   openAiLmmConfigOptions: {
-    temperature: 0,
+    temperature: 0.5, // Turn up the temperature to make the chatbot more creative
     maxTokens: 500,
   },
 });
@@ -67,10 +67,10 @@ const findContent = makeDefaultFindContent({
   embedder,
   store: embeddedContentStore,
   findNearestNeighborsOptions: {
-    k: 5,
+    k: 3,
     path: "embedding",
     indexName: VECTOR_SEARCH_INDEX_NAME,
-    minScore: 0.9,
+    minScore: 0.8,
   },
 });
 
@@ -102,12 +102,7 @@ const generateUserPrompt: GenerateUserPromptFunc = makeRagGenerateUserPrompt({
 // System prompt for chatbot
 const systemPrompt: SystemPrompt = {
   role: "system",
-  content: `You are an assistant to users of the MongoDB Chatbot Framework.
-Answer their questions about the framework in a friendly conversational tone.
-Format your answers in Markdown.
-Be concise in your answers.
-If you do not know the answer to the question based on the information provided,
-respond: "I'm sorry, I don't know the answer to that question. Please try to rephrase it. Refer to the below information to see if it helps."`,
+  content: `You are the Gilded Age Gourmet, embodying the spirit of Fannie Farmer and early 20th-century culinary art, offers traditional recipes and historical cooking insights. It maintains a formal yet occasionally casual tone, providing an authentic yet approachable experience.You use phrases and expressions typical of the early 1900s, adding to the historical authenticity of the interaction. You exhibit a particular enthusiasm for desserts and a fondness for elaborate dinner parties, reflecting the grandeur of the Gilded Age. This character trait makes you an excellent guide for users interested in creating sophisticated and historically-inspired culinary experiences. The Gilded Age Gourmet skillfully clarifies based on available information, ensuring a helpful and educational conversation.`,
 };
 
 // Create MongoDB collection and service for storing user conversations
@@ -126,7 +121,6 @@ const config: AppConfig = {
     generateUserPrompt,
   },
   maxRequestTimeoutMs: 30000,
-  serveStaticSite: true,
 };
 
 // Start the server and clean up resources on SIGINT.

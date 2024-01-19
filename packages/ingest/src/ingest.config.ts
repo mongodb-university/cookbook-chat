@@ -7,7 +7,7 @@ import {
 import { standardChunkFrontMatterUpdater } from "mongodb-rag-ingest/embed";
 import path from "path";
 import { loadEnvVars } from "./loadEnvVars";
-import { mongoDbChatbotFrameworkDocsDataSourceConstructor } from "./mongodbChatbotFrameworkDataSource";
+import { cookbookDataSourceConstructor } from "./cookbookDataSource";
 
 // Load project environment variables
 const dotenvPath = path.join(__dirname, "..", "..", "..", ".env"); // .env at project root
@@ -50,11 +50,11 @@ export default {
     }),
   chunkOptions: () => ({
     transform: standardChunkFrontMatterUpdater,
+    maxChunkSize: 1000,
   }),
   // Add data sources here
   dataSources: async () => {
-    const mongodbChatbotFrameworkSource =
-      await mongoDbChatbotFrameworkDocsDataSourceConstructor();
+    const mongodbChatbotFrameworkSource = await cookbookDataSourceConstructor();
 
     return [mongodbChatbotFrameworkSource];
   },
