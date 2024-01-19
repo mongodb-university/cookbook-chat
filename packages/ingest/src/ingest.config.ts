@@ -16,6 +16,8 @@ const {
   MONGODB_DATABASE_NAME,
   OPENAI_API_KEY,
   OPENAI_EMBEDDING_MODEL,
+  GITHUB_REPO_NAME,
+  GITHUB_REPO_OWNER,
 } = loadEnvVars(dotenvPath);
 
 export default {
@@ -54,8 +56,11 @@ export default {
   }),
   // Add data sources here
   dataSources: async () => {
-    const mongodbChatbotFrameworkSource = await cookbookDataSourceConstructor();
+    const cookbookSource = await cookbookDataSourceConstructor({
+      githubRepoName: GITHUB_REPO_NAME,
+      githubRepoUsername: GITHUB_REPO_OWNER,
+    });
 
-    return [mongodbChatbotFrameworkSource];
+    return [cookbookSource];
   },
 } satisfies Config;

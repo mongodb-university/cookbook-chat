@@ -3,23 +3,32 @@ import {
   makeMdOnGithubDataSource,
 } from "mongodb-rag-ingest/sources";
 
-const repoBaseUrl = "https://github.com/mongodben/cookbook-chat/";
+export const cookbookDataSourceConstructor = async ({
+  githubRepoName,
+  githubRepoUsername,
+}: {
+  githubRepoName: string;
+  githubRepoUsername: string;
+}) => {
+  const repoBaseUrl = `https://github.com/${githubRepoUsername}/${githubRepoName}/`;
 
-const cookbookConfig: MakeMdOnGithubDataSourceParams = {
-  name: "boston-cooking-school",
-  repoUrl: repoBaseUrl,
-  repoLoaderOptions: {
-    branch: "main",
-  },
-  filter: (path) =>
-    path.startsWith("/cookbook-source") && !path.endsWith("README.md"),
-  pathToPageUrl(pathInRepo) {
-    const baseUrl = repoBaseUrl + "blob/main";
-    const path = baseUrl + pathInRepo;
+  const cookbookConfig: MakeMdOnGithubDataSourceParams = {
+    name: "boston-cooking-school",
+    repoUrl: repoBaseUrl,
+    repoLoaderOptions: {
+      branch: "main",
+    },
+    filter: (path) =>
+      path.startsWith("/cookbook-source") && !path.endsWith("README.md"),
+    pathToPageUrl(pathInRepo) {
+      const baseUrl = repoBaseUrl + "blob/main";
+      const path = baseUrl + pathInRepo;
 
-    return path;
-  },
-  extractTitle: (pageContent) => extractFirstH1(pageContent) ?? undefined,
+      return path;
+    },
+    extractTitle: (pageContent) => extractFirstH1(pageContent) ?? undefined,
+  };
+  return await makeMdOnGithubDataSource(cookbookConfig);
 };
 
 // Helper function
@@ -34,6 +43,3 @@ function extractFirstH1(markdownText: string) {
   }
   return null;
 }
-
-export const cookbookDataSourceConstructor = async () =>
-  await makeMdOnGithubDataSource(cookbookConfig);
