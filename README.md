@@ -1,6 +1,8 @@
-# Cookbook Chatbot
+# Gilded Age Gourmet
 
-This project contains the source code for a full-stack retrieval augmented generation (RAG) chatbot that you can use to search for recipes and learn about the fundamentals of cooking.
+_Cooking chatbot inspired by the Boston Cooking School Cookbook_
+
+This project contains the source code for the Gilded Age Gourmet, a full-stack retrieval augmented generation (RAG) chatbot that you can use to search for recipes and learn about the fundamentals of cooking.
 
 The chatbot uses the [Boston Cooking School Cookbook](https://www.gutenberg.org/cache/epub/65061/pg65061-images.html) by Fannie Farmer as it's source of recipes and cooking knowledge. The cookbook, first published in 1896, was the best-selling cookbook of the turn of the 20th century. Conveniently, for our chatbot's purposes, the cookbook is also in the public domain.
 
