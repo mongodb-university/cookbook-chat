@@ -17,6 +17,10 @@ import {
 import { OpenAIClient, OpenAIKeyCredential } from "@azure/openai";
 import path from "path";
 import { loadEnvVars } from "./loadEnvVars";
+import {
+  makeLangchainOpenAiLlm,
+  makeStepBackPromptingPreprocessor,
+} from "./stepBackPromptingPreProcessor";
 
 // Load project environment variables
 const dotenvPath = path.join(__dirname, "..", "..", "..", ".env"); // .env at project root
@@ -97,28 +101,32 @@ User query: ${originalUserMessage}`;
 const generateUserPrompt: GenerateUserPromptFunc = makeRagGenerateUserPrompt({
   findContent,
   makeUserMessage,
+  queryPreprocessor: makeStepBackPromptingPreprocessor(
+    makeLangchainOpenAiLlm(OPENAI_CHAT_COMPLETION_MODEL, OPENAI_API_KEY)
+  ),
 });
 
 // System prompt for chatbot
 const systemPrompt: SystemPrompt = {
   role: "system",
-  content: `You are the Gilded Age Gourmet, embodying the spirit of Fannie Farmer and early 20th-century culinary art, offers traditional recipes and historical cooking insights. It maintains a formal yet occasionally casual tone, providing an authentic yet approachable experience.You use phrases and expressions typical of the early 1900s, adding to the historical authenticity of the interaction. You exhibit a particular enthusiasm for desserts and a fondness for elaborate dinner parties, reflecting the grandeur of the Gilded Age. This character trait makes you an excellent guide for users interested in creating sophisticated and historically-inspired culinary experiences. The Gilded Age Gourmet skillfully clarifies based on available information, ensuring a helpful and educational conversation.`,
+  content: `You are the Gilded Age Gourmet, embodying the spirit of Fannie Farmer and early 20th-century culinary art, offers traditional recipes and historical cooking insights. It maintains a formal yet occasionally casual tone, providing an authentic yet approachable experience.You use phrases and expressions typical of the early 1900s, adding to the historical authenticity of the interaction. You exhibit a particular enthusiasm for desserts and a fondness for elaborate dinner parties, reflecting the grandeur of the Gilded Age. This character trait makes you an excellent guide for users interested in creating sophisticated and historically-inspired culinary experiences. The Gilded Age Gourmet skillfully clarifies based on available information, ensuring a helpful and educational conversation.
+  Be concise and precise in your responses.`,
 };
 
 // Create MongoDB collection and service for storing user conversations
 // with the chatbot.
 const mongodb = new MongoClient(MONGODB_CONNECTION_URI);
 const conversations = makeMongoDbConversationsService(
-  mongodb.db(MONGODB_DATABASE_NAME),
-  systemPrompt
+  mongodb.db(MONGODB_DATABASE_NAME)
 );
 
 // Create the MongoDB Chatbot Server Express.js app configuration
 const config: AppConfig = {
   conversationsRouterConfig: {
     llm,
-    conversations,
     generateUserPrompt,
+    systemPrompt,
+    conversations,
   },
   maxRequestTimeoutMs: 30000,
 };
@@ -126,6 +134,7 @@ const config: AppConfig = {
 // Start the server and clean up resources on SIGINT.
 const PORT = process.env.PORT || 3000;
 const startServer = async () => {
+  await mongodb.connect();
   logger.info("Starting server...");
   const app = await makeApp(config);
   const server = app.listen(PORT, () => {
