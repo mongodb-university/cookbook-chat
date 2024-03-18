@@ -24,7 +24,7 @@ function MyApp() {
         </p>
       </header>
       <Chatbot
-        serverBaseUrl="http://localhost:3000/api/v1"
+        serverBaseUrl={import.meta.env.VITE_SERVER_BASE_URL}
         isExperimental={false}
       >
         <>
