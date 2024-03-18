@@ -102,6 +102,7 @@ const generateUserPrompt: GenerateUserPromptFunc = makeRagGenerateUserPrompt({
   findContent,
   makeUserMessage,
   queryPreprocessor: makeStepBackPromptingPreprocessor(
+    // @ts-ignore
     makeLangchainOpenAiLlm(OPENAI_CHAT_COMPLETION_MODEL, OPENAI_API_KEY)
   ),
 });
