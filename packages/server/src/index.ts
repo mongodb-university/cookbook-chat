@@ -13,6 +13,7 @@ import {
   GenerateUserPromptFunc,
   makeRagGenerateUserPrompt,
   MakeUserMessageFunc,
+  UserMessage,
 } from "mongodb-chatbot-server";
 import { OpenAIClient, OpenAIKeyCredential } from "@azure/openai";
 import path from "path";
@@ -83,7 +84,8 @@ const findContent = makeDefaultFindContent({
 const makeUserMessage: MakeUserMessageFunc = async function ({
   content,
   originalUserMessage,
-}): Promise<OpenAiChatMessage & { role: "user" }> {
+  preprocessedUserMessage,
+}) {
   const chunkSeparator = "~~~~~~";
   const context = content.map((c) => c.text).join(`\n${chunkSeparator}\n`);
   const contentForLlm = `Using the following information, answer the user query.
@@ -94,7 +96,13 @@ ${context}
 
 
 User query: ${originalUserMessage}`;
-  return { role: "user", content: contentForLlm };
+  return {
+    role: "user",
+    content: originalUserMessage,
+    preprocessedContent: preprocessedUserMessage,
+    contentForLlm,
+    contextContent: content.map((c) => ({ text: c.text, url: c.url })),
+  };
 };
 
 // Generates the user prompt for the chatbot using RAG
