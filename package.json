@@ -1,7 +1,7 @@
 {
-  "name": "mongodb-chatbot-framework-quick-start",
+  "name": "cookbook-chatbot",
   "version": "1.0.0",
-  "description": "Quick start code for MongoDB Chatbot Framework",
+  "description": "Quick start code for MongoDB Chatbot Framework using the Fannie Farmer Cookbook",
   "workspaces": [
     "packages/*"
   ],
