@@ -7,6 +7,9 @@ import dotenv from "dotenv";
   you need to update this function to support those environment variables.
  */
 export function loadEnvVars(path: string) {
+  Object.keys(process.env).forEach(key => {
+    delete process.env[key];
+  });
   dotenv.config({ path });
   const {
     MONGODB_CONNECTION_URI,
